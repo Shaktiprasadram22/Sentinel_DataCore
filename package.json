@@ -1,0 +1,22 @@
+{
+  "name": "SentinelDataCore",
+  "version": "1.0.0",
+  "description": "Secure Mock Stock + News API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "lru": "^3.1.0",
+    "lru-cache": "^10.0.0",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
