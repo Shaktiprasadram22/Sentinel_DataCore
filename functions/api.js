@@ -78,7 +78,18 @@ app.get("/api/news/:id", async (req, res) => {
   if (!news) return res.status(404).json({ message: "News not found" });
   res.json(news);
 });
-
+// Get news by relatedStocks symbol
+app.get("/api/news/related/:symbol", async (req, res) => {
+  await connectDB();
+  const symbol = req.params.symbol;
+  const news = await News.find({ relatedStocks: symbol });
+  if (!news || news.length === 0) {
+    return res
+      .status(404)
+      .json({ message: "No news found for this stock symbol" });
+  }
+  res.json(news);
+});
 // Root endpoint
 app.get("/api", (req, res) => {
   res.json({ message: "SentinelDataCore API is running (Netlify Functions)" });
