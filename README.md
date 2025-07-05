@@ -1,5 +1,4 @@
 # 🏦 SentinelDataCore
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)](https://www.mongodb.com/atlas)
@@ -8,6 +7,8 @@
 
 > A secure, scalable RESTful API for mock stock market data and financial news—built with Node.js, Express, MongoDB, and JWT authentication.  
 > **Now deployable as serverless functions on Netlify!**
+
+**Base URL:** `https://sentineldatacore.netlify.app`
 
 ## 🎯 Project Overview
 
@@ -79,7 +80,6 @@ graph TD
 ```
 
 **Tech Stack:**
-
 - **Express.js**: Handles routing and middleware
 - **MongoDB Atlas**: Scalable, cloud-based database
 - **Mongoose**: Schema and model management
@@ -108,13 +108,14 @@ graph TD
 
 ### 📰 News
 
-| Method   | Endpoint        | Description                    | Auth Required |
-| -------- | --------------- | ------------------------------ | ------------- |
-| `GET`    | `/api/news`     | Get all news articles          | ❌            |
-| `GET`    | `/api/news/:id` | Get news article by ID         | ❌            |
-| `POST`   | `/api/news`     | Add one/multiple news articles | ✅            |
-| `PUT`    | `/api/news/:id` | Update news article by ID      | ✅            |
-| `DELETE` | `/api/news/:id` | Delete news article by ID      | ✅            |
+| Method   | Endpoint                    | Description                    | Auth Required |
+| -------- | --------------------------- | ------------------------------ | ------------- |
+| `GET`    | `/api/news`                 | Get all news articles          | ❌            |
+| `GET`    | `/api/news/:id`             | Get news article by ID         | ❌            |
+| `GET`    | `/api/news/related/:symbol` | Get all news for a stock symbol| ❌            |
+| `POST`   | `/api/news`                 | Add one/multiple news articles | ✅            |
+| `PUT`    | `/api/news/:id`             | Update news article by ID      | ✅            |
+| `DELETE` | `/api/news/:id`             | Delete news article by ID      | ✅            |
 
 ### 🔑 Authentication Flow
 
@@ -123,14 +124,12 @@ graph TD
 3. **JWT Token**: Required for all `POST`, `PUT`, and `DELETE` operations
 
 To perform admin actions:
-
 1. Login at `/api/auth/login` with your credentials
 2. Use the returned JWT token in the `Authorization: Bearer <token>` header
 
 ## 🛠️ Setup & How to Run Locally
 
 ### Prerequisites
-
 - Node.js 18+
 - MongoDB Atlas account
 - Git
@@ -138,22 +137,18 @@ To perform admin actions:
 ### Installation Steps
 
 1. **Clone the repository**
-
    ```bash
    git clone https://github.com/Shaktiprasadram22/SentinelDataCore.git
    cd SentinelDataCore
    ```
 
 2. **Install dependencies**
-
    ```bash
    npm install
    ```
 
 3. **Environment Configuration**
-
    Create a `.env` file in the root directory:
-
    ```env
    MONGO_URI=your_mongodb_atlas_connection_string
    JWT_SECRET=your_super_secret_jwt_key
@@ -161,19 +156,15 @@ To perform admin actions:
    ```
 
 4. **Seed Admin User**
-
    Edit `seedAdmin.js` with your desired admin credentials, then run:
-
    ```bash
    node seedAdmin.js
    ```
 
 5. **Start the Server Locally**
-
    ```bash
    # Development mode
    npm run dev
-
    # Production mode
    npm start
    ```
@@ -188,20 +179,16 @@ To perform admin actions:
 ### Step-by-Step Deployment
 
 1. **Prepare Serverless Handler**
-
    - Place your Express API handler in `functions/api.js`
    - Add a `netlify.toml` file in your project root
 
 2. **Deploy to Netlify**
-
    - Push your code to GitHub
    - Connect your repository to Netlify
    - Set environment variables in Netlify dashboard
 
 3. **Configure Environment Variables**
-
    In your Netlify dashboard, go to **Site settings > Environment variables** and add:
-
    ```
    MONGO_URI=your_mongodb_atlas_connection_string
    JWT_SECRET=your_super_secret_jwt_key
@@ -209,7 +196,7 @@ To perform admin actions:
 
 4. **Netlify Auto-Deploy**
    - Netlify will automatically deploy your API as serverless functions
-   - Your API will be available at `https://<your-site>.netlify.app/api/*`
+   - Your API will be available at `https://<your-site-name>.netlify.app/api/*`
 
 ### 📁 Netlify Configuration (netlify.toml)
 
@@ -227,7 +214,6 @@ Your `netlify.toml` should look like this:
 ```
 
 **What this does:**
-
 - All requests to `/api/*` are routed to your Express handler in `functions/api.js`
 - **Example**: `/api/news` → returns all news from your DB
 - **Example**: `/api/stocks` → returns all stocks from your DB
@@ -235,7 +221,6 @@ Your `netlify.toml` should look like this:
 ### 🔐 Environment Variables
 
 Set these in your Netlify dashboard (never in your code!):
-
 ```env
 MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_super_secret_jwt_key
@@ -244,22 +229,18 @@ JWT_SECRET=your_super_secret_jwt_key
 ## 🔧 Configuration
 
 ### Admin User Setup
-
 1. Edit `seedAdmin.js` to set your admin username and password
 2. Run the script to create or update the admin user in your database
 3. The system prevents public registration for security
 
 ### Mock Data Loading
-
 - **Stocks**: Bulk upload using `/api/stocks` with a JSON array
 - **News**: Bulk upload using `/api/news` with a JSON array
 
 ## 🔒 Security Features
 
 ### Rate Limiting
-
 Global rate limiting prevents abuse:
-
 ```javascript
 const rateLimit = require("express-rate-limit");
 const limiter = rateLimit({
@@ -270,7 +251,6 @@ app.use(limiter);
 ```
 
 ### Security Best Practices
-
 - ✅ No public registration (admin-only access)
 - ✅ Environment variables for sensitive data
 - ✅ JWT token-based authentication
@@ -285,13 +265,88 @@ app.use(limiter);
 - **Cloud Database**: MongoDB Atlas enables automatic scaling and reliability
 - **Serverless Auto-Scaling**: Netlify Functions automatically scale with traffic
 
-## 🔄 Example Usage
+## 📋 Example Usage
 
-### Local Development
+### Get All Stocks
+**Request:** `GET /api/stocks`
 
+**Response:**
+```json
+[
+  {
+    "symbol": "RELIANCE.NS",
+    "sector": "Nifty Oil & Gas",
+    "lastPrice": 2850.10,
+    "volume": 950000,
+    "resistance": 2900,
+    "support": 2800
+  }
+]
+```
+
+### Get Stock by Symbol
+**Request:** `GET /api/stocks/RELIANCE.NS`
+
+**Response:**
+```json
+{
+  "symbol": "RELIANCE.NS",
+  "sector": "Nifty Oil & Gas",
+  "lastPrice": 2850.10,
+  "volume": 950000,
+  "resistance": 2900,
+  "support": 2800
+}
+```
+
+### Get All News
+**Request:** `GET /api/news`
+
+**Response:**
+```json
+[
+  {
+    "_id": "abc123",
+    "headline": "Reliance launches new green energy project",
+    "content": "Reliance Industries announced...",
+    "relatedStocks": ["RELIANCE.NS"]
+  }
+]
+```
+
+### Get News by ID
+**Request:** `GET /api/news/60c9e0b8e1d2f2a5b4e5d6c7`
+
+**Response:**
+```json
+{
+  "_id": "60c9e0b8e1d2f2a5b4e5d6c7",
+  "headline": "Reliance launches new green energy project",
+  "content": "Reliance Industries announced...",
+  "relatedStocks": ["RELIANCE.NS"]
+}
+```
+
+### Get News by Related Stock Symbol
+**Request:** `GET /api/news/related/RELIANCE.NS`
+
+**Response:**
+```json
+[
+  {
+    "_id": "abc123",
+    "headline": "Reliance launches new green energy project",
+    "content": "Reliance Industries announced...",
+    "relatedStocks": ["RELIANCE.NS"]
+  }
+]
+```
+
+### Authentication Example
+
+**Login Request:**
 ```bash
-# Login and Get JWT Token
-POST http://localhost:5000/api/auth/login
+POST /api/auth/login
 Content-Type: application/json
 
 {
@@ -300,23 +355,39 @@ Content-Type: application/json
 }
 ```
 
-### Production (Netlify)
+**Response:**
+```json
+{
+  "token": "your_jwt_token"
+}
+```
 
+### Local Development
+```bash
+# Login and Get JWT Token
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+{
+  "username": "your_admin_username",
+  "password": "your_admin_password"
+}
+```
+
+### Production (Netlify)
 ```bash
 # Get all news
-GET https://<your-site>.netlify.app/api/news
+GET https://sentineldatacore.netlify.app/api/news
 
 # Get all stocks
-GET https://<your-site>.netlify.app/api/stocks
+GET https://sentineldatacore.netlify.app/api/stocks
 
 # Get single stock
-GET https://<your-site>.netlify.app/api/stocks/RELIANCE.NS
+GET https://sentineldatacore.netlify.app/api/stocks/RELIANCE.NS
 ```
 
 ### Add Stock Data
-
 ```bash
-POST https://<your-site>.netlify.app/api/stocks
+POST https://sentineldatacore.netlify.app/api/stocks
 Authorization: Bearer <your_jwt_token>
 Content-Type: application/json
 
@@ -331,6 +402,27 @@ Content-Type: application/json
   }
 ]
 ```
+
+## 🚨 Error Handling
+
+- **404 Not Found**: Returned if a stock or news item does not exist
+  ```json
+  {
+    "message": "Stock not found"
+  }
+  ```
+
+- **401 Unauthorized**: Returned if JWT is missing or invalid for protected endpoints
+
+## 🏗️ Deployment Notes
+
+- All endpoints are available at `/api/...` thanks to Netlify's `netlify.toml` redirect
+- Set your MongoDB and JWT secrets as environment variables in Netlify
+- **Express.js** (serverless via Netlify Functions)
+- **MongoDB Atlas** (cloud database)
+- **Mongoose** (schema management)
+- **JWT** (admin authentication)
+- **Rate limiting & CORS** (security and cross-origin support)
 
 ## 🤝 Contributing
 
@@ -355,9 +447,11 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## 📞 Support
 
 For questions, issues, or feature requests:
-
 - 🐛 [Open an issue](https://github.com/Shaktiprasadram22/SentinelDataCore/issues)
 - 💬 [Start a discussion](https://github.com/Shaktiprasadram22/SentinelDataCore/discussions)
+- 📧 [GitHub Repo](https://github.com/Shaktiprasadram22/SentinelDataCore)
+
+*For advanced usage, admin endpoints, or a downloadable Postman collection, just ask!*
 
 ## ⚠️ Security Reminder
 
@@ -367,7 +461,8 @@ For questions, issues, or feature requests:
 
 ---
 
-<div align="center">
-  <p>Built with ❤️ by <a href="https://github.com/Shaktiprasadram22">Shaktiprasad Ram</a></p>
-  <p>⭐ Star this repo if you found it helpful!</p>
-</div>
+Built with ❤️ by **Shaktiprasad Ram**
+
+⭐ Star this repo if you found it helpful!
+
+**SentinelDataCore** is built for learning, prototyping, and powering the next generation of trading and analytics apps.
