@@ -4,8 +4,10 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)](https://www.mongodb.com/atlas)
 [![Express.js](https://img.shields.io/badge/Express.js-4.x-lightgrey.svg)](https://expressjs.com/)
+[![Netlify](https://img.shields.io/badge/Netlify-Serverless-blue.svg)](https://www.netlify.com/)
 
-> A secure, scalable RESTful API for mock stock market data and financial news—built with Node.js, Express, MongoDB, and JWT authentication.
+> A secure, scalable RESTful API for mock stock market data and financial news—built with Node.js, Express, MongoDB, and JWT authentication.  
+> **Now deployable as serverless functions on Netlify!**
 
 ## 🎯 Project Overview
 
@@ -27,6 +29,7 @@ SentinelDataCore provides a robust backend infrastructure for stock trading plat
 - 🛡️ **Rate Limiting** - Built-in protection against abuse and DDoS
 - 🏗️ **Modular Architecture** - Clean, maintainable codebase structure
 - 📈 **Bulk Operations** - Efficient data seeding and testing capabilities
+- 🌐 **Serverless Deployment** - Deploy to Netlify Functions for auto-scaling
 
 ## 📁 Project Structure
 
@@ -49,12 +52,15 @@ SentinelDataCore/
 │   ├── authRoutes.js
 │   ├── newsRoutes.js
 │   └── stockRoutes.js
+├── 📁 functions/            # Netlify serverless functions
+│   └── api.js               # Express API (serverless handler)
 ├── 📄 .env                  # Environment variables (never commit!)
 ├── 📄 .gitignore
 ├── 📄 cleardata.js          # Script to clear all stocks/news
 ├── 📄 package.json
 ├── 📄 seedAdmin.js          # Script to seed the admin user
-└── 📄 server.js             # Main Express app entry point
+├── 📄 netlify.toml          # Netlify configuration
+└── 📄 server.js             # Main Express app entry point (for local)
 ```
 
 ## 🏗️ System Architecture
@@ -80,6 +86,7 @@ graph TD
 - **JWT**: Secures admin actions (add, update, delete)
 - **LRU Cache**: Optimizes GET requests, reduces DB load
 - **Rate Limiting**: Prevents abuse and accidental DDoS
+- **Netlify Functions**: Serverless API deployment
 
 ## 📚 API Documentation
 
@@ -120,7 +127,7 @@ To perform admin actions:
 1. Login at `/api/auth/login` with your credentials
 2. Use the returned JWT token in the `Authorization: Bearer <token>` header
 
-## 🛠️ Setup & Installation
+## 🛠️ Setup & How to Run Locally
 
 ### Prerequisites
 
@@ -161,7 +168,7 @@ To perform admin actions:
    node seedAdmin.js
    ```
 
-5. **Start the Server**
+5. **Start the Server Locally**
 
    ```bash
    # Development mode
@@ -175,6 +182,64 @@ To perform admin actions:
    ```bash
    node cleardata.js
    ```
+
+## 🌐 Deploying to Netlify
+
+### Step-by-Step Deployment
+
+1. **Prepare Serverless Handler**
+
+   - Place your Express API handler in `functions/api.js`
+   - Add a `netlify.toml` file in your project root
+
+2. **Deploy to Netlify**
+
+   - Push your code to GitHub
+   - Connect your repository to Netlify
+   - Set environment variables in Netlify dashboard
+
+3. **Configure Environment Variables**
+
+   In your Netlify dashboard, go to **Site settings > Environment variables** and add:
+
+   ```
+   MONGO_URI=your_mongodb_atlas_connection_string
+   JWT_SECRET=your_super_secret_jwt_key
+   ```
+
+4. **Netlify Auto-Deploy**
+   - Netlify will automatically deploy your API as serverless functions
+   - Your API will be available at `https://<your-site>.netlify.app/api/*`
+
+### 📁 Netlify Configuration (netlify.toml)
+
+Your `netlify.toml` should look like this:
+
+```toml
+[build]
+  functions = "functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+```
+
+**What this does:**
+
+- All requests to `/api/*` are routed to your Express handler in `functions/api.js`
+- **Example**: `/api/news` → returns all news from your DB
+- **Example**: `/api/stocks` → returns all stocks from your DB
+
+### 🔐 Environment Variables
+
+Set these in your Netlify dashboard (never in your code!):
+
+```env
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_super_secret_jwt_key
+```
 
 ## 🔧 Configuration
 
@@ -218,13 +283,15 @@ app.use(limiter);
 - **Intelligent Caching**: LRU cache reduces database load
 - **Horizontal Scaling**: Ready for multiple Node.js processes/containers
 - **Cloud Database**: MongoDB Atlas enables automatic scaling and reliability
+- **Serverless Auto-Scaling**: Netlify Functions automatically scale with traffic
 
 ## 🔄 Example Usage
 
-### Login and Get JWT Token
+### Local Development
 
 ```bash
-POST /api/auth/login
+# Login and Get JWT Token
+POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
@@ -233,10 +300,23 @@ Content-Type: application/json
 }
 ```
 
+### Production (Netlify)
+
+```bash
+# Get all news
+GET https://<your-site>.netlify.app/api/news
+
+# Get all stocks
+GET https://<your-site>.netlify.app/api/stocks
+
+# Get single stock
+GET https://<your-site>.netlify.app/api/stocks/RELIANCE.NS
+```
+
 ### Add Stock Data
 
 ```bash
-POST /api/stocks
+POST https://<your-site>.netlify.app/api/stocks
 Authorization: Bearer <your_jwt_token>
 Content-Type: application/json
 
@@ -250,12 +330,6 @@ Content-Type: application/json
     "support": 2800
   }
 ]
-```
-
-### Fetch All Stocks
-
-```bash
-GET /api/stocks
 ```
 
 ## 🤝 Contributing
@@ -288,6 +362,8 @@ For questions, issues, or feature requests:
 ## ⚠️ Security Reminder
 
 > **Important**: Never store admin credentials in `.env` or source code. Use `seedAdmin.js` to securely create or update your admin user.
+
+> **For Netlify**: Set all environment variables in the Netlify dashboard, never in your code repository.
 
 ---
 
