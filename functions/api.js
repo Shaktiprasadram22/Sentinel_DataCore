@@ -1,36 +1,85 @@
 const serverless = require("serverless-http");
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// Example: GET /api/news
-app.get("/api/news", (req, res) => {
-  res.json([
-    { headline: "Sample News 1", content: "This is a sample news article." },
-    { headline: "Sample News 2", content: "Another sample news article." },
-  ]);
+// --- MongoDB Connection ---
+const mongoUri = process.env.MONGO_URI;
+let isConnected = false;
+
+async function connectDB() {
+  if (!isConnected) {
+    await mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    isConnected = true;
+    console.log("Connected to MongoDB");
+  }
+}
+
+// --- Mongoose Schemas ---
+const newsSchema = new mongoose.Schema(
+  {
+    headline: String,
+    content: String,
+    relatedStocks: [String],
+  },
+  { collection: "news" }
+);
+
+const stockSchema = new mongoose.Schema(
+  {
+    symbol: String,
+    sector: String,
+    lastPrice: Number,
+    volume: Number,
+    resistance: Number,
+    support: Number,
+  },
+  { collection: "stocks" }
+);
+
+const News = mongoose.models.News || mongoose.model("News", newsSchema);
+const Stock = mongoose.models.Stock || mongoose.model("Stock", stockSchema);
+
+// --- API Endpoints ---
+
+// Get all news
+app.get("/api/news", async (req, res) => {
+  await connectDB();
+  const news = await News.find({});
+  res.json(news);
 });
 
-// Example: GET /api/stocks
-app.get("/api/stocks", (req, res) => {
-  res.json([
-    { symbol: "RELIANCE.NS", price: 2850.1 },
-    { symbol: "TCS.NS", price: 3984.4 },
-  ]);
+// Get all stocks
+app.get("/api/stocks", async (req, res) => {
+  await connectDB();
+  const stocks = await Stock.find({});
+  res.json(stocks);
 });
 
-// Example: GET /api/stocks/:symbol
-app.get("/api/stocks/:symbol", (req, res) => {
-  const { symbol } = req.params;
-  // For demonstration, just return the symbol
-  res.json({ symbol, price: Math.random() * 4000 });
+// Get single stock by symbol
+app.get("/api/stocks/:symbol", async (req, res) => {
+  await connectDB();
+  const stock = await Stock.findOne({ symbol: req.params.symbol });
+  if (!stock) return res.status(404).json({ message: "Stock not found" });
+  res.json(stock);
 });
 
-// Example: Root endpoint
+// Get single news by ID
+app.get("/api/news/:id", async (req, res) => {
+  await connectDB();
+  const news = await News.findById(req.params.id);
+  if (!news) return res.status(404).json({ message: "News not found" });
+  res.json(news);
+});
+
+// Root endpoint
 app.get("/api", (req, res) => {
   res.json({ message: "SentinelDataCore API is running (Netlify Functions)" });
 });
