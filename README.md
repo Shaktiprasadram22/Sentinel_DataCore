@@ -1,263 +1,249 @@
-# SentinelDataCore
+# 🏦 SentinelDataCore
 
-[![Node.js](https://img.shields.io/badge/Node.js-16%2B-green.svg)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-4.x-blue.svg)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-brightgreen.svg)](https://www.mongodb.com/atlas)
-[![JWT](https://img.shields.io/badge/JWT-Authentication-orange.svg)](https://jwt.io/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)](https://www.mongodb.com/atlas)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-lightgrey.svg)](https://expressjs.com/)
 
-**Secure Mock Stock & News RESTful API**
+> A secure, scalable RESTful API for mock stock market data and financial news—built with Node.js, Express, MongoDB, and JWT authentication.
 
-Built with Node.js, Express, MongoDB Atlas, and JWT authentication.
+## 🎯 Project Overview
 
----
+SentinelDataCore provides a robust backend infrastructure for stock trading platforms, analytics dashboards, and financial research tools. It simulates real-time stock data and news feeds, enabling rapid development and testing without the need for costly third-party APIs.
 
-## Table of Contents
+## 🚀 Use Cases
 
-- [Overview](#overview)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
-- [Running the Server](#running-the-server)
-- [Mock Data](#mock-data)
-- [API Reference](#api-reference)
-- [Authentication Guide](#authentication-guide)
-- [Example Usage (Postman)](#example-usage-postman)
-- [System Design](#system-design)
-- [Scaling & Performance](#scaling--performance)
-- [Contributing](#contributing)
-- [License](#license)
+- **Frontend/Fullstack Developers**: Building trading dashboards or portfolio management tools
+- **Data Scientists**: Prototyping investment models with realistic mock data
+- **Hackathons**: Rapid prototyping for fintech ideas and applications
+- **Education**: Teaching RESTful API design, authentication, and system architecture
 
----
+## ✨ Features
 
-## Overview
+- 🔐 **JWT-based Authentication** - Secure admin access for data modification
+- 📊 **Full CRUD Operations** - Complete stock and news management (single or bulk)
+- ⚡ **LRU Caching** - Lightning-fast GET endpoints with intelligent caching
+- ☁️ **MongoDB Atlas** - Cloud-based data persistence and scalability
+- 🛡️ **Rate Limiting** - Built-in protection against abuse and DDoS
+- 🏗️ **Modular Architecture** - Clean, maintainable codebase structure
+- 📈 **Bulk Operations** - Efficient data seeding and testing capabilities
 
-**SentinelDataCore** is a robust, modular RESTful API that simulates real-time stock market data and financial news. It is designed for developers building trading platforms, dashboards, or analytics tools who need realistic, structured data without the cost or restrictions of premium APIs.
+## 📁 Project Structure
 
-### Why SentinelDataCore?
+```
+SentinelDataCore/
+├── 📁 config/
+│   └── db.js                # MongoDB connection setup
+├── 📁 controllers/          # Business logic for each resource
+│   ├── authController.js
+│   ├── newsController.js
+│   └── stockController.js
+├── 📁 middleware/
+│   ├── authMiddleware.js    # JWT verification
+│   └── cacheMiddleware.js   # LRU cache for GET endpoints
+├── 📁 models/               # Mongoose schemas
+│   ├── News.js
+│   ├── Stock.js
+│   └── User.js
+├── 📁 routes/               # Express route definitions
+│   ├── authRoutes.js
+│   ├── newsRoutes.js
+│   └── stockRoutes.js
+├── 📄 .env                  # Environment variables (never commit!)
+├── 📄 .gitignore
+├── 📄 cleardata.js          # Script to clear all stocks/news
+├── 📄 package.json
+├── 📄 seedAdmin.js          # Script to seed the admin user
+└── 📄 server.js             # Main Express app entry point
+```
 
-- 🚀 **Fast & Efficient**: Built with performance in mind using LRU caching
-- 🔒 **Secure**: JWT-based authentication for data modification
-- 📊 **Realistic Data**: Mock stock and news data that mirrors real-world scenarios
-- 🌐 **Scalable**: MongoDB Atlas integration for cloud-scale storage
-- 🛠️ **Developer-Friendly**: Clean, modular architecture for easy extension
+## 🏗️ System Architecture
 
----
+```mermaid
+graph TD
+    A[Client] --> B[Express.js API]
+    B --> C[JWT Authentication]
+    B --> D[LRU Cache]
+    B --> E[Rate Limiter]
+    B --> F[MongoDB Atlas]
+    C --> G[Admin Operations]
+    D --> H[Fast Data Retrieval]
+    E --> I[Abuse Prevention]
+    F --> J[Data Persistence]
+```
 
-## Features
+**Tech Stack:**
 
-✅ **Full CRUD Operations** for stocks and news articles  
-✅ **JWT-based Admin Authentication** for secure data modification  
-✅ **LRU Cache** for high-traffic GET endpoints to improve response times  
-✅ **MongoDB Atlas** for scalable cloud storage  
-✅ **Bulk Insert Support** for efficient mock data seeding  
-✅ **Clean, Modular Architecture** for easy maintenance and extension  
-✅ **Ready for CI/CD** and cloud deployment
+- **Express.js**: Handles routing and middleware
+- **MongoDB Atlas**: Scalable, cloud-based database
+- **Mongoose**: Schema and model management
+- **JWT**: Secures admin actions (add, update, delete)
+- **LRU Cache**: Optimizes GET requests, reduces DB load
+- **Rate Limiting**: Prevents abuse and accidental DDoS
 
----
+## 📚 API Documentation
 
-## Prerequisites
+### 🔐 Authentication
 
-Before you begin, ensure you have the following installed:
+| Method | Endpoint          | Description               | Auth Required |
+| ------ | ----------------- | ------------------------- | ------------- |
+| `POST` | `/api/auth/login` | Admin login (returns JWT) | ❌            |
 
-- **Node.js** v16 or higher
-- **MongoDB Atlas** account with a cluster
-- **Postman** or similar API client (optional but recommended)
+### 📈 Stocks
 
----
+| Method   | Endpoint              | Description             | Auth Required |
+| -------- | --------------------- | ----------------------- | ------------- |
+| `GET`    | `/api/stocks`         | Get all stocks          | ❌            |
+| `GET`    | `/api/stocks/:symbol` | Get stock by symbol     | ❌            |
+| `POST`   | `/api/stocks`         | Add one/multiple stocks | ✅            |
+| `PUT`    | `/api/stocks/:symbol` | Update stock by symbol  | ✅            |
+| `DELETE` | `/api/stocks/:symbol` | Delete stock by symbol  | ✅            |
 
-## Installation & Setup
+### 📰 News
 
-### 1. Clone the repository
+| Method   | Endpoint        | Description                    | Auth Required |
+| -------- | --------------- | ------------------------------ | ------------- |
+| `GET`    | `/api/news`     | Get all news articles          | ❌            |
+| `GET`    | `/api/news/:id` | Get news article by ID         | ❌            |
+| `POST`   | `/api/news`     | Add one/multiple news articles | ✅            |
+| `PUT`    | `/api/news/:id` | Update news article by ID      | ✅            |
+| `DELETE` | `/api/news/:id` | Delete news article by ID      | ✅            |
+
+### 🔑 Authentication Flow
+
+1. **Public Access**: All `GET` endpoints are publicly accessible
+2. **Admin Access**: Only seeded admin can perform modifications
+3. **JWT Token**: Required for all `POST`, `PUT`, and `DELETE` operations
+
+To perform admin actions:
+
+1. Login at `/api/auth/login` with your credentials
+2. Use the returned JWT token in the `Authorization: Bearer <token>` header
+
+## 🛠️ Setup & Installation
+
+### Prerequisites
+
+- Node.js 18+
+- MongoDB Atlas account
+- Git
+
+### Installation Steps
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/Shaktiprasadram22/SentinelDataCore.git
+   cd SentinelDataCore
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Environment Configuration**
+
+   Create a `.env` file in the root directory:
+
+   ```env
+   MONGO_URI=your_mongodb_atlas_connection_string
+   JWT_SECRET=your_super_secret_jwt_key
+   PORT=5000
+   ```
+
+4. **Seed Admin User**
+
+   Edit `seedAdmin.js` with your desired admin credentials, then run:
+
+   ```bash
+   node seedAdmin.js
+   ```
+
+5. **Start the Server**
+
+   ```bash
+   # Development mode
+   npm run dev
+
+   # Production mode
+   npm start
+   ```
+
+6. **Optional: Clear Data**
+   ```bash
+   node cleardata.js
+   ```
+
+## 🔧 Configuration
+
+### Admin User Setup
+
+1. Edit `seedAdmin.js` to set your admin username and password
+2. Run the script to create or update the admin user in your database
+3. The system prevents public registration for security
+
+### Mock Data Loading
+
+- **Stocks**: Bulk upload using `/api/stocks` with a JSON array
+- **News**: Bulk upload using `/api/news` with a JSON array
+
+## 🔒 Security Features
+
+### Rate Limiting
+
+Global rate limiting prevents abuse:
+
+```javascript
+const rateLimit = require("express-rate-limit");
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+```
+
+### Security Best Practices
+
+- ✅ No public registration (admin-only access)
+- ✅ Environment variables for sensitive data
+- ✅ JWT token-based authentication
+- ✅ Password hashing with bcrypt
+- ✅ Input validation and sanitization
+
+## ⚡ Performance & Scaling
+
+- **High Concurrency**: Handles thousands of concurrent users via Node.js async model
+- **Intelligent Caching**: LRU cache reduces database load
+- **Horizontal Scaling**: Ready for multiple Node.js processes/containers
+- **Cloud Database**: MongoDB Atlas enables automatic scaling and reliability
+
+## 🔄 Example Usage
+
+### Login and Get JWT Token
 
 ```bash
-git clone https://github.com/Shaktiprasadram22/SentinelDataCore.git
-cd SentinelDataCore
-```
-
-### 2. Install dependencies
-
-```bash
-npm install
-```
-
-### 3. Create a `.env` file in the root directory:
-
-```env
-MONGO_URI=your_mongodb_atlas_connection_string
-JWT_SECRET=your_super_secret_jwt_key
-PORT=5000
-```
-
-> **Important**:
->
-> - Replace `your_mongodb_atlas_connection_string` with your actual MongoDB URI
-> - Replace `your_super_secret_jwt_key` with a secure random string
-
-### 4. Generate a JWT secret (recommended):
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-Copy the output and use it as your `JWT_SECRET`.
-
----
-
-## Running the Server
-
-### Development Mode
-
-```bash
-npm run dev
-```
-
-### Production Mode
-
-```bash
-npm start
-```
-
-The API will be available at `http://localhost:5000/`
-
----
-
-## Mock Data
-
-The API supports realistic mock data for both stocks and news.
-
-### Example Stocks
-
-```json
-[
-  {
-    "symbol": "TCS",
-    "sector": "IT",
-    "lastPrice": 3950.25,
-    "volume": 1200000,
-    "resistance": 4000,
-    "support": 3900
-  },
-  {
-    "symbol": "RELIANCE",
-    "sector": "Energy",
-    "lastPrice": 2850.1,
-    "volume": 950000,
-    "resistance": 2900,
-    "support": 2800
-  }
-]
-```
-
-### Example News
-
-```json
-[
-  {
-    "headline": "TCS Q4 Results 2025: Revenue Grows, Profit Dips Amid Global Uncertainty",
-    "content": "Tata Consultancy Services (TCS) reported a 1.7% drop in net profit to ₹12,224 crore for Q4 FY25, even as revenue grew 5.3% year-on-year to ₹64,479 crore.",
-    "relatedStocks": ["TCS"]
-  },
-  {
-    "headline": "Reliance Industries to Invest ₹75,000 Crore in Green Energy",
-    "content": "Reliance Industries announced a major investment in renewable energy projects over the next three years.",
-    "relatedStocks": ["RELIANCE"]
-  }
-]
-```
-
-You can insert single or multiple items at once using the POST endpoints.
-
----
-
-## API Reference
-
-### Authentication
-
-| Method | Endpoint             | Description         |
-| ------ | -------------------- | ------------------- |
-| `POST` | `/api/auth/register` | Register admin user |
-| `POST` | `/api/auth/login`    | Login admin user    |
-
-### Stocks
-
-| Method   | Endpoint              | Description                | Auth Required |
-| -------- | --------------------- | -------------------------- | ------------- |
-| `GET`    | `/api/stocks`         | Get all stocks             | No            |
-| `GET`    | `/api/stocks/:symbol` | Get stock by symbol        | No            |
-| `POST`   | `/api/stocks`         | Add one or multiple stocks | Yes           |
-| `PUT`    | `/api/stocks/:symbol` | Update stock by symbol     | Yes           |
-| `DELETE` | `/api/stocks/:symbol` | Delete stock by symbol     | Yes           |
-
-### News
-
-| Method   | Endpoint        | Description                       | Auth Required |
-| -------- | --------------- | --------------------------------- | ------------- |
-| `GET`    | `/api/news`     | Get all news articles             | No            |
-| `GET`    | `/api/news/:id` | Get news article by ID            | No            |
-| `POST`   | `/api/news`     | Add one or multiple news articles | Yes           |
-| `PUT`    | `/api/news/:id` | Update news article by ID         | Yes           |
-| `DELETE` | `/api/news/:id` | Delete news article by ID         | Yes           |
-
----
-
-## Authentication Guide
-
-### 1. Register an admin user (only once):
-
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "username": "admin",
-  "password": "yourpassword"
-}
-```
-
-### 2. Login to get a JWT token:
-
-```http
 POST /api/auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "yourpassword"
+  "username": "your_admin_username",
+  "password": "your_admin_password"
 }
 ```
 
-### 3. Use the token for protected routes:
+### Add Stock Data
 
-In Postman, add a header:
-
-```
-Authorization: Bearer <your_token>
-```
-
----
-
-## Example Usage (Postman)
-
-### Add a Stock (Single or Bulk)
-
-```http
+```bash
 POST /api/stocks
-Authorization: Bearer <your_token>
+Authorization: Bearer <your_jwt_token>
 Content-Type: application/json
 
 [
   {
-    "symbol": "TCS",
-    "sector": "IT",
-    "lastPrice": 3950.25,
-    "volume": 1200000,
-    "resistance": 4000,
-    "support": 3900
-  },
-  {
-    "symbol": "RELIANCE",
-    "sector": "Energy",
+    "symbol": "RELIANCE.NS",
+    "sector": "Nifty Oil & Gas",
     "lastPrice": 2850.10,
     "volume": 950000,
     "resistance": 2900,
@@ -266,164 +252,46 @@ Content-Type: application/json
 ]
 ```
 
-### Add News (Single or Bulk)
-
-```http
-POST /api/news
-Authorization: Bearer <your_token>
-Content-Type: application/json
-
-[
-  {
-    "headline": "TCS Q4 Results 2025: Revenue Grows, Profit Dips Amid Global Uncertainty",
-    "content": "Tata Consultancy Services (TCS) reported a 1.7% drop in net profit...",
-    "relatedStocks": ["TCS"]
-  }
-]
-```
-
 ### Fetch All Stocks
 
-```http
+```bash
 GET /api/stocks
 ```
 
-### Fetch All News
+## 🤝 Contributing
 
-```http
-GET /api/news
-```
+Contributions are welcome! Here's how you can help:
 
----
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add some amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
 
-## System Design
+## 📝 License
 
-### Architecture Overview
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-- **Express.js**: Handles routing and middleware
-- **MongoDB Atlas**: Cloud-based NoSQL database for stocks and news
-- **Mongoose**: ODM for MongoDB
-- **JWT**: Secures admin routes
-- **LRU Cache Middleware**: Caches frequent GET requests for fast response and reduced DB load
-- **Controllers/Routes/Models**: Clean separation for maintainability
-- **Bulk Insert Support**: Efficient for seeding and batch operations
-- **Cache Invalidation**: Ensures fresh data after add/update/delete
+## 🙏 Acknowledgments
 
-### System Architecture Diagram
+- Built for learning, prototyping, and powering the next generation of trading and analytics apps
+- Inspired by the need for accessible mock financial data APIs
+- Thanks to all contributors and the open-source community
 
-```
-[Client App/Postman]
-       |
-       v
-[Express API Server]
- |      |      |
- |   [JWT]  [LRU Cache]
- |      |      |
- v      v      v
-[MongoDB Atlas]
-```
+## 📞 Support
 
-### Project Structure
+For questions, issues, or feature requests:
 
-```
-SentinelDataCore/
-├── controllers/
-│   ├── authController.js
-│   ├── stockController.js
-│   └── newsController.js
-├── models/
-│   ├── User.js
-│   ├── Stock.js
-│   └── News.js
-├── routes/
-│   ├── auth.js
-│   ├── stocks.js
-│   └── news.js
-├── middleware/
-│   ├── auth.js
-│   └── cache.js
-├── .env
-├── .gitignore
-├── package.json
-├── server.js
-└── README.md
-```
+- 🐛 [Open an issue](https://github.com/Shaktiprasadram22/SentinelDataCore/issues)
+- 💬 [Start a discussion](https://github.com/Shaktiprasadram22/SentinelDataCore/discussions)
+
+## ⚠️ Security Reminder
+
+> **Important**: Never store admin credentials in `.env` or source code. Use `seedAdmin.js` to securely create or update your admin user.
 
 ---
 
-## Scaling & Performance
-
-### Performance Features
-
-- **Async Operations**: Handles 10,000+ concurrent users with async code and caching
-- **LRU Caching**: Reduces database load and improves response times
-- **Bulk Operations**: Efficient batch processing for large datasets
-- **Connection Pooling**: MongoDB connection optimization
-
-### Scaling Options
-
-- **Cluster-ready**: Can use Node.js cluster module for multi-core scaling
-- **Horizontal Scaling**: Add more instances behind a load balancer for high traffic
-- **MongoDB Atlas**: Scalable, managed cloud database with auto-scaling capabilities
-- **Docker Support**: Containerized deployment for easy scaling
-
-### Performance Metrics
-
-- **Response Time**: < 100ms for cached requests
-- **Throughput**: 1000+ requests per second
-- **Concurrent Users**: 10,000+ supported
-- **Database**: MongoDB Atlas with 99.9% uptime
-
----
-
-## Contributing
-
-We welcome contributions! Here's how you can help:
-
-### Getting Started
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Guidelines
-
-- Follow the existing code style
-- Add tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting
-
-### Issues
-
-Please use the GitHub issue tracker to report bugs or request features.
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Support
-
-If you encounter any issues or have questions:
-
-1. Check the [documentation](#api-reference)
-2. Search existing [issues](https://github.com/yourusername/SentinelDataCore/issues)
-3. Create a new issue if needed
-
----
-
-## Acknowledgments
-
-- Built with [Express.js](https://expressjs.com/)
-- Database powered by [MongoDB Atlas](https://www.mongodb.com/atlas)
-- Authentication using [JWT](https://jwt.io/)
-- Caching implementation with [LRU Cache](https://www.npmjs.com/package/lru-cache)
-
----
-
-**Happy Coding! 🚀**
+<div align="center">
+  <p>Built with ❤️ by <a href="https://github.com/Shaktiprasadram22">Shaktiprasad Ram</a></p>
+  <p>⭐ Star this repo if you found it helpful!</p>
+</div>
